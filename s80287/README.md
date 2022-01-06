@@ -1,6 +1,7 @@
 Duy Tien Nguyen s80287
 
 * Funktionalität der Programme
+
 - Funktion Ihres Clients + Server ohne Fehlersimulation: funktioniert
 - Funktion Ihres Clients + Server mit Fehlersimulation: funktioniert
 - Funktion Ihres Clients + Server über Hochschulproxy: funktioniert
@@ -9,6 +10,7 @@ Duy Tien Nguyen s80287
 
 
 * How to run this UDP-Protocol
+
 I. Without paket loss and paket delay
 1. Open two windows in terminal
 2. 1st. window terminal: call server
