@@ -212,26 +212,26 @@ public class Client extends FileTransfer {
 	 * @param args command line arguments.
 	 */
 	private void parseArguments(String[] args) {
-		if (args.length < 3) {
+		if (args.length < 4) {
 			out.println(ARGUMENT_MESSAGE);
 			exitApp("Error while parsing arguments: Too few Arguments", 1);
 		}
 		// Assign Server, Port and File
-		setConnectionIP(args[0]);
-		setPort(Integer.parseInt(args[1]));
-		setClientFile(args[2]);
-		if (args.length > 3) {
-			// Check for debug flag (only even argument-length)
-			if (args.length % 2 == 0 && (args[3].contains("--debug") || (args.length > 5 && args[5].contains("--debug")))) {
+		setConnectionIP(args[1]);
+		setPort(Integer.parseInt(args[2]));
+		setClientFile(args[3]);
+		if (args.length > 4) {
+			// Check for debug flag (only uneven argument-length)
+			if (args.length % 2 == 1 && (args[4].contains("--debug") || (args.length > 6 && args[6].contains("--debug")))) {
 				setDebug(true);
 			} else {
 				err.println(ARGUMENT_MESSAGE);
 				exitApp("Error while parsing arguments: Searched for --debug, but was not found!", 1);
 			}
 			// Assign optional Parameters
-			if (args.length > 4) {
-				setPacketLossRate(Float.parseFloat(args[3]));
-				setPacketDelay(Integer.parseInt(args[4]));
+			if (args.length > 5) {
+				setPacketLossRate(Float.parseFloat(args[4]));
+				setPacketDelay(Integer.parseInt(args[5]));
 			}
 		}
 	}

@@ -1,2 +1,0 @@
-s80287 Duy Tien Nguyen
-test file for upd-protocol
