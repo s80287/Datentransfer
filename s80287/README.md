@@ -1,6 +1,6 @@
 Duy Tien Nguyen s80287
 
-* Funktionalität der Programme
+## Funktionalität der Programme
 
 - Funktion Ihres Clients + Server ohne Fehlersimulation: funktioniert
 - Funktion Ihres Clients + Server mit Fehlersimulation: funktioniert
@@ -9,7 +9,7 @@ Duy Tien Nguyen s80287
 - Funktion Ihres Clients + Hochschulserver mit Fehlersimulation: funktioniert
 
 
-* How to run this UDP-Protocol
+## How to run this UDP-Protocol
 
 I. Without paket loss and paket delay
 1. Open two windows in terminal
