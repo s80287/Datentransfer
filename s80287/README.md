@@ -14,9 +14,9 @@ Duy Tien Nguyen s80287
 I. Without paket loss and paket delay
 1. Open two windows in terminal
 2. 1st. window terminal: call server
-bash server.sh 3333
+'bash server.sh 3333'
 3. 2nd. window terminal: run client
-bash bash client.sh localhost 3333 test-file.txt
+'bash bash client.sh localhost 3333 test-file.txt'
 
 II. With paket loss and paket delay
 1. call server
