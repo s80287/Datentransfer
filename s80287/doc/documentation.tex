@@ -1,0 +1,160 @@
+\newcommand{\customDir}{}
+\input{\customDir _LaTeX_master/LaTeX_master_setup.sty}
+
+%\setboolean{twosided}{true}
+%\setCustomDocumentClass{scrartcl}
+%\setCustomDesign{htw}
+%\setCustomSlidePath{Folien}
+
+\setCustomTitle{Beleg UDP-Dateiübertragung}
+\setCustomAuthor{Duy Tien Nguyen}
+%\setCustomNoteA{TitlepageNoteBeforeAuthor}
+
+\setCustomSignature{\textcolor{darkgray}{\customAuthor{}\\ s80287}}	% Formatierung der Signatur in der Fußzeile
+\setCustomTitleAuthor{\customAuthor{} (s80287)}	% Formatierung des Autors auf dem Titelblatt
+
+\input{\customDir _LaTeX_master/LaTeX_master.sty}
+\input{\customDir _LaTeX_master/LaTeX_master_macros.sty}
+
+%\bibliography{\customDir _Literatur/HTW_Literatur.bib}
+%\setlength{\headheight}{10mm}	% default: ca. 8mm
+\setlength{\footheight}{10mm}	% default: ca. 8mm
+
+
+\usepackage{tikz-uml}
+
+% TeXDoclet Compatibility:
+\makeatletter
+\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
+\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
+\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
+\makeatother
+
+% TeXDoclet Preamble:
+%\input{javadoc/TeXDoclet_preamble.tex}
+\usepackage{graphics}
+\usepackage{ifpdf}
+\lstset{language=Java,breaklines=true}
+
+\newcommand{\entityintro}[3]{%
+  \hbox to \hsize{%
+    \vbox{%
+      \hbox to .2in{}%
+    }%
+    {\bf  #1}%
+    \dotfill\pageref{#2}%
+  }
+  \makebox[\hsize]{%
+    \parbox{.4in}{}%
+    \parbox[l]{5in}{%
+      \vspace{1mm}%
+      #3%
+      \vspace{1mm}%
+    }%
+  }%
+}
+\newcommand{\refdefined}[1]{
+\expandafter\ifx\csname r@#1\endcsname\relax
+\relax\else
+{$($in \ref{#1}, page \pageref{#1}$)$}\fi}
+\chardef\textbackslash=`\\
+
+\begin{document}
+
+%\selectlanguage{english}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\chapter{Dokumentation}
+
+\section{Programmierung}
+\label{programing}
+
+\subsection{Anforderungen}
+Die Programmierung wurde nach den Anforderungen der Aufgabenstellung gelöst. Diese lauten wie folgt:
+\begin{itemize}
+\item Client:
+\begin{itemize}
+\item Über Konsole mit Parametern „Zieladresse“, „Portnummer“ und „Dateiname“ aufrufbar (zum debuggen auch „Paketverlust“ und „mittlere Verzögerung“)
+\item Zeigt während und nach der Übertragung jede Sekunde die Datenrate an
+\item Korrigiert Fehler bei verlorenen oder vertauschten Paketen:\\
+verlorenes ACK: Datenpaket erneut senden, vertauschtes ACK: vorhergehendes Datenpaket senden.
+\end{itemize}
+\item Server:
+\begin{itemize}
+\item Über Konsole mit dem Parameter „Portnummer“ aufrufbar (zum debuggen auch „Paketverlust“ und „mittlere Verzögerung“)
+\item Speichert Datei in seinem Pfad unter dem korrekten Dateiname (Zeichen „1“ wird angehängt, wenn Datei bereits existiert)
+\item Korrigiert Fehler bei verlorenen oder vertauschten Paketen:\\
+verlorenes Datenpaket: kein ACK senden, vertauschtes Datenpaket: ACK des vorhergehenden Datenpakets senden.
+\end{itemize}
+\end{itemize}
+
+%Abgrenzung
+\subsection{Probleme/Limitierungen/Verbesserungsvorschläge}
+\label{abgrenz}
+Unten sind die Probleme/Limitierungen/Verbesserungsvorschläge für das Protokoll.
+\begin{itemize}
+\item Der Server kann nicht mehrere Clients auf einmal bedienen.
+\item Der Client kann nicht wissen, ob die Datei tatsächlich fertig übertragen wurde, wenn das letzte ACK-Paket vom Server verloren geht.
+\item Die Klasse FileCopy wird hier nicht hinzugefügt.
+\end{itemize}
+
+\section{Zustandsdiagramme}
+\label{stated}
+\subsection{Client}
+\begin{center}
+\begin{tikzpicture}
+\umlstateinitial[y=3,name=start]
+\umlbasicstate[y=0,name=startupload, fill=white]{Initialisiere Upload}
+\umltrans{start}{startupload}
+\umlstatefinal[x=6,y=-2,name=finalerror]
+\umlHVtrans[arg={Fehler},pos=.5, anchor2=90]{startupload}{finalerror}
+%\umlbasicstate[y=-4,name=sendfirst, fill=white]{Sende erstes Paket}
+%\umltrans[arg={Ok},left, pos=.5]{startupload}{sendfirst}
+%\umltrans[arg={Timeout},pos=.5]{sendfirst}{finalerror}
+\umlbasicstate[y=-4,name=sendpacket, fill=white]{Sende Paket}
+\umltrans[arg={Ok},left, pos=.5]{startupload}{sendpacket}
+\umlHVtrans[arg={Timeout mit max. Anzahl Versuche},pos=.1, below right, anchor2=-90]{sendpacket}{finalerror}
+\umltrans[recursive=160|200|2.5cm, recursive direction = right to right, left, arg={ACK empfangen || Timeout},pos=1.5]{sendpacket}{sendpacket}
+\umlstatefinal[y=-7,name=finalok]
+\umltrans[arg={ACK zu letztem Paket empfangen}, pos=.5, left]{sendpacket}{finalok}
+\end{tikzpicture}
+\end{center}
+
+\subsection{Server}
+\begin{center}
+\begin{tikzpicture}
+\umlstateinitial[y=3,name=start]
+\umlbasicstate[y=0,name=waitpacket, fill=white]{Warte auf Paket}
+\umltrans{start}{startupload}
+%\umlbasicstate[y=-4,name=sendfirst, fill=white]{Sende erstes Paket}
+%\umltrans[arg={Ok},left, pos=.5]{startupload}{sendfirst}
+%\umltrans[arg={Timeout},pos=.5]{sendfirst}{finalerror}
+\umlbasicstate[y=-4,name=processpacket, fill=white]{Verarbeite Paket}
+\umltrans[arg={Paket empfangen},left, anchor1=-110, anchor2=110, pos=.5]{startupload}{processpacket}
+\umlbasicstate[y=-8,name=sendack, fill=white]{Sende ACK}
+\umltrans[arg={Ok || Falsches Paket}, left, pos=.5]{processpacket}{sendack}
+\umltrans[arg={Fehler},right, anchor1=70, anchor2=-70, pos=.5]{processpacket}{waitpacket}
+\umlHVHtrans[right, arg={},pos=1.5,anchor1=180, anchor2=180, arm1=-2.5cm]{sendack}{startupload}
+\umlbasicstate[y=-12,name=processfile, fill=white]{Verarbeite Datei}
+\umltrans[arg={Paket hat Datei-CRC}, left, pos=.5, anchor1=-110, anchor2=110]{sendack}{processfile}
+\umlHVHtrans[right, arg={Fehler},pos=1.5,anchor1=0, anchor2=0, arm1=1.5cm]{processfile}{startupload}
+\umltrans[arg={Ok},right, anchor1=70, anchor2=-70, pos=.5]{processfile}{sendack}
+\end{tikzpicture}
+\end{center}
+
+%\chapter{JavaDoc}
+%\selectlanguage{english}
+%\label{javadoc}
+%\input{javadoc/TeXDoclet.tex}
+
+%\newpage
+%\printbibliography
+
+\end{document}
